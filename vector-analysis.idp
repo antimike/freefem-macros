@@ -1,0 +1,37 @@
+func real safeDivide(real num, real num0){
+				return abs(num) >= num0 ? 1/num : 1/num0; 
+}
+
+macro Cross(Ax, Ay, Az, Bx, By, Bz) [Ay*Bz - Az*By, Az*Bx - Ax*Bz, Ax*By - Bx*Ay] //EOM
+
+// Vector calculus
+macro Curl2d(Ax, Ay) (dx(Ay) - dy(Ax)) //EOM
+macro Curl3d(Ax, Ay, Az) [dy(Az)-dz(Ay), dz(Ax)-dx(Az), dx(Ay)-dy(Ax)] //EOM
+macro Divergence2d(Ax, Ay) (dx(Ax) + dy(Ay)) //EOM
+macro Divergence3d(Ax, Ay, Az) (dx(Ax) + dy(Ay) + dz(Az)) //EOM
+macro Grad2d(F) ([dx(F), dy(F)]) //EOM
+macro Grad3d(F) ([dx(F), dy(F), dz(F)]) //EOM
+
+// Coordinate systems and unit vectors
+func real rFromxyz(real a, real b, real c) = sqrt(a^2 + b^2 + c^2);
+func real rhoFromxyz(real a, real b, real c) = sqrt(a^2 + b^2);
+func real[int] thetaHat(real a, real b, real c, real r0){
+				return [a*c*safeDivide(rFromxyz(a, b, c), r0)*safeDivide(rhoFromxyz(a, b, c), r0), b*c*safeDivide(rFromxyz(a, b, c), r0)*safeDivide(rhoFromxyz(a, b, c), r0), -rhoFromxyz(a, b, c)*safeDivide(rFromxyz(a, b, c), r0)];
+}
+func real[int] phiHat(real a, real b, real c, real rho0){ 
+				return [-b*safeDivide(rho(a, b, c), rho0), a*safeDivide(rho(a, b, c), rho0), 0];
+}
+func real[int] rHat(real a, real b, real c, real r0){
+				return [a*safeDivide(rFromxyz(a, b, c), r0), b*safeDivide(rFromxyz(a, b, c), r0), c*safeDivide(rFromxyz(a, b, c), r0)];
+}
+
+// Surface, volume, and line elements
+func dVspherical(real R, real Theta, real Phi){
+				return R^2*sin(Theta);
+}
+func dApolar(real R, real Theta){
+				return R;
+}
+macro dn(f) (N.x*dx(f) + N.y*dy(f) + N.z*dz(f)) //EOM
+macro dnCross(Fx, Fy, Fz) Cross(N.x, N.y, N.z, Fx, Fy, Fz) //EOM
+macro fluxElement(Fx, Fy, Fz) [Fx, Fy, Fz]'*N //EOM
